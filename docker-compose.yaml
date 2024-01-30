@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  mqtt-sparkplug:
+    build: .
+    container_name: mqtt-sparkplug
+    volumes:
+      - ./certs:/usr/src/app/certs
+      - ./proto:/usr/src/app/proto
+    env_file:
+      - .env
+    restart: always  # Ensures that the service restarts automatically
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongo-db 
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    restart: always  # Ensures that the service restarts automatically
+    ports:
+      - "27017:27017"  # Expose MongoDB default port
+
+  mongo-express:
+    image: mongo-express:1.0.0-alpha.4
+    depends_on:
+      - mongodb  # Ensures that mongo-express starts after mongodb
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_SERVER: mongodb
+    restart: always 
+    ports:
+      - "8081:8081"  
+       
+
